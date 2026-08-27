@@ -1,0 +1,29 @@
+/*
+ * global.css
+ *
+ * App-wide base styles. Typography and color rules follow DESIGN.md.
+ */
+
+body {
+  font-family: 'Open Sans', -apple-system, 'Segoe UI', Roboto, sans-serif;
+}
+
+/*
+ * Vuetify's default field-label opacity (0.6) combined with our on-surface token measures
+ * ~3.35:1 against the app background — below WCAG AA's 4.5:1 for normal text. Removing the
+ * extra dimming keeps the color's own baked-in 87% alpha, which measures 10:1+ in both themes.
+ */
+.v-field-label {
+  opacity: 1;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
+}

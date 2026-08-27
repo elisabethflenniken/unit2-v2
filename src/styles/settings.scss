@@ -1,0 +1,15 @@
+/**
+ * src/styles/settings.scss
+ *
+ * Configures SASS variables and Vuetify overwrites
+ */
+
+// https://vuetifyjs.com/features/sass-variables/
+// Open Sans everywhere, including inside Vuetify's own component internals (DESIGN.md).
+$body-font-family: "'Open Sans', -apple-system, 'Segoe UI', Roboto, sans-serif";
+$heading-font-family: "'Open Sans', -apple-system, 'Segoe UI', Roboto, sans-serif";
+
+@use 'vuetify/settings' with (
+  $body-font-family: $body-font-family,
+  $heading-font-family: $heading-font-family
+);
