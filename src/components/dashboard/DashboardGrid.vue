@@ -25,29 +25,30 @@
 </script>
 
 <style scoped>
+/*
+ * Flexbox, not a fixed-column grid: small/medium widgets share whatever row they land in via
+ * flex-grow, so two of them split it evenly, one alone stretches to fill it, and on narrow
+ * viewports they naturally wrap to one per row — no separate breakpoint rules needed.
+ */
 .dashboard-grid {
-  display: grid;
-  grid-template-columns: repeat(12, 1fr);
+  display: flex;
+  flex-wrap: wrap;
+  align-items: stretch;
   gap: 16px;
 }
 
-.widget-slot--small {
-  grid-column: span 3;
+.widget-slot {
+  flex-grow: 1;
 }
 
+.widget-slot--small,
 .widget-slot--medium {
-  grid-column: span 6;
+  flex-basis: 46%;
+  min-width: 340px;
 }
 
 .widget-slot--large {
-  grid-column: span 12;
-}
-
-@media (max-width: 960px) {
-  .widget-slot--small,
-  .widget-slot--medium,
-  .widget-slot--large {
-    grid-column: span 12;
-  }
+  flex-basis: 100%;
+  min-width: 100%;
 }
 </style>

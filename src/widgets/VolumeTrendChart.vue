@@ -1,9 +1,5 @@
 <template>
   <WidgetCard :hide-controls="detailLevel === 'full'" :title="title" :widget-id="widgetId">
-    <template v-if="state === 'ready' && result" #header-actions>
-      <StatusChip :level="result.summary.status" />
-    </template>
-
     <div v-if="state === 'loading'">
       <v-skeleton-loader type="image" />
     </div>
@@ -40,7 +36,6 @@
   import { Line } from 'vue-chartjs'
   import { useTheme } from 'vuetify'
   import DataTable from '@/components/common/DataTable.vue'
-  import StatusChip from '@/components/common/StatusChip.vue'
   import WidgetCard from '@/components/dashboard/WidgetCard.vue'
   import { useWidgetData } from '@/composables/useWidgetData'
   import { useFakeData } from '@/data/generateFakeData'

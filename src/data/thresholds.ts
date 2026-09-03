@@ -63,3 +63,19 @@ export function exceptionSeverityStatus (severity: 'low' | 'medium' | 'high'): S
   }
   return 'watch'
 }
+
+function asPct (fraction: number): string {
+  return `${Math.round(fraction * 100)}%`
+}
+
+// Human-readable versions of the thresholds above, for StatusChip tooltips — generated from the
+// same constants so the tooltip text can never drift out of sync with the actual logic.
+export function describeRegionalOnTimeRateThreshold (): string {
+  return `Regional on-time rate: ${asPct(thresholds.regionalOnTimeRate.good)}+ is on target, `
+    + `${asPct(thresholds.regionalOnTimeRate.watch)}–${asPct(thresholds.regionalOnTimeRate.good)} is watch, `
+    + `below ${asPct(thresholds.regionalOnTimeRate.watch)} is critical.`
+}
+
+export function describeExceptionSeverityMapping (): string {
+  return 'Exception severity: high severity is critical; medium and low severity are watch.'
+}

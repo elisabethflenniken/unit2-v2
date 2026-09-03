@@ -1,9 +1,5 @@
 <template>
   <WidgetCard :hide-controls="detailLevel === 'full'" :title="title" :widget-id="widgetId">
-    <template v-if="state === 'ready' && result" #header-actions>
-      <StatusChip :level="result.status" />
-    </template>
-
     <div v-if="state === 'loading'">
       <v-skeleton-loader type="heading, text, text" />
     </div>
@@ -42,6 +38,7 @@
         <DataTable
           :label-header="result.breakdownLabelHeader"
           :rows="result.breakdown"
+          :status-description="result.breakdownStatusDescription"
           :value-header="result.breakdownValueHeader"
         />
       </div>
@@ -50,10 +47,8 @@
 </template>
 
 <script lang="ts" setup>
-  import type { StatusLevel } from '@/data/thresholds'
   import DataTable, { type DataTableRow } from '@/components/common/DataTable.vue'
   import Sparkline from '@/components/common/Sparkline.vue'
-  import StatusChip from '@/components/common/StatusChip.vue'
   import WidgetCard from '@/components/dashboard/WidgetCard.vue'
   import { useWidgetData } from '@/composables/useWidgetData'
   import { useFakeData } from '@/data/generateFakeData'
@@ -65,6 +60,7 @@
     getSnapshotsForRegion,
     getVolumeSummary,
   } from '@/data/selectors'
+  import { describeRegionalOnTimeRateThreshold } from '@/data/thresholds'
   import { useFiltersStore } from '@/stores/filters'
   import { formatShortDate } from '@/utils/formatDate'
 
@@ -82,23 +78,23 @@
   interface KpiResult {
     displayValue: string
     subtitle: string
-    status: StatusLevel
     trendDirection: 'up' | 'down' | null
     sparklineValues: number[]
     breakdown: DataTableRow[]
     breakdownLabelHeader: string
     breakdownValueHeader: string
+    breakdownStatusDescription: string
   }
 
   const noData: KpiResult = {
     displayValue: '—',
     subtitle: 'No data',
-    status: 'critical',
     trendDirection: null,
     sparklineValues: [],
     breakdown: [],
     breakdownLabelHeader: '',
     breakdownValueHeader: '',
+    breakdownStatusDescription: '',
   }
 
   const filtersStore = useFiltersStore()
@@ -116,12 +112,12 @@
       return {
         displayValue: summary.current.toLocaleString(),
         subtitle: `${summary.pctChange >= 0 ? '+' : ''}${(summary.pctChange * 100).toFixed(1)}% vs. ${trailingDays}-day avg`,
-        status: summary.status,
         trendDirection: summary.pctChange >= 0 ? 'up' : 'down',
         sparklineValues: rangeSnapshots.slice(-14).map(s => s.shipmentVolume),
         breakdown: rangeSnapshots.toReversed().map(s => ({ label: formatShortDate(s.date), value: s.shipmentVolume.toLocaleString() })),
         breakdownLabelHeader: 'Date',
         breakdownValueHeader: 'Shipment volume',
+        breakdownStatusDescription: '',
       }
     }
 
@@ -131,12 +127,12 @@
       return {
         displayValue: `${(summary.rate * 100).toFixed(1)}%`,
         subtitle: `${summary.diff >= 0 ? '+' : ''}${(summary.diff * 100).toFixed(1)} pts vs. ${trailingDays}-day avg`,
-        status: summary.status,
         trendDirection: summary.diff >= 0 ? 'up' : 'down',
         sparklineValues: rangeSnapshots.slice(-14).map(s => s.onTimeRate * 100),
         breakdown: rangeSnapshots.toReversed().map(s => ({ label: formatShortDate(s.date), value: `${(s.onTimeRate * 100).toFixed(1)}%` })),
         breakdownLabelHeader: 'Date',
         breakdownValueHeader: 'On-time rate',
+        breakdownStatusDescription: '',
       }
     }
 
@@ -146,30 +142,27 @@
       return {
         displayValue: String(summary.count),
         subtitle: `${summary.diffFromYesterday > 0 ? '+' : ''}${summary.diffFromYesterday} vs. yesterday`,
-        status: summary.status,
         trendDirection: summary.diffFromYesterday === 0 ? null : (summary.diffFromYesterday > 0 ? 'up' : 'down'),
         sparklineValues: rangeSnapshots.slice(-14).map(s => s.openExceptions),
         breakdown: rangeSnapshots.toReversed().map(s => ({ label: formatShortDate(s.date), value: String(s.openExceptions) })),
         breakdownLabelHeader: 'Date',
         breakdownValueHeader: 'Open exceptions',
+        breakdownStatusDescription: '',
       }
     }
 
     // metric === 'regions'
     const regionSummaries = getRegionalSummaries(data, trailingDays)
     const goodCount = regionSummaries.filter(r => r.status === 'good').length
-    const hasCritical = regionSummaries.some(r => r.status === 'critical')
-    const hasWatch = regionSummaries.some(r => r.status === 'watch')
-    const status: StatusLevel = hasCritical ? 'critical' : (hasWatch ? 'watch' : 'good')
     return {
       displayValue: `${goodCount}/${regionSummaries.length}`,
       subtitle: `${goodCount} of ${regionSummaries.length} regions on target`,
-      status,
       trendDirection: null,
       sparklineValues: [],
       breakdown: regionSummaries.map(r => ({ label: r.name, value: `${(r.onTimeRate * 100).toFixed(1)}%`, status: r.status })),
       breakdownLabelHeader: 'Region',
       breakdownValueHeader: 'On-time rate',
+      breakdownStatusDescription: describeRegionalOnTimeRateThreshold(),
     }
   }
 

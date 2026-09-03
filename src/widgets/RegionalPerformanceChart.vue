@@ -1,9 +1,5 @@
 <template>
   <WidgetCard :hide-controls="detailLevel === 'full'" :title="title" :widget-id="widgetId">
-    <template v-if="state === 'ready' && result" #header-actions>
-      <StatusChip :level="overallStatus" />
-    </template>
-
     <div v-if="state === 'loading'">
       <v-skeleton-loader type="image" />
     </div>
@@ -25,7 +21,7 @@
       <ul v-if="detailLevel === 'summary'" class="region-legend d-flex flex-wrap ga-2 mt-4 pa-0">
         <li v-for="region in result" :key="region.regionId" class="d-flex align-center ga-2">
           <span class="text-body-2">{{ region.name }} ({{ (region.onTimeRate * 100).toFixed(1) }}%)</span>
-          <StatusChip :level="region.status" />
+          <StatusChip :description="regionalThresholdDescription" :level="region.status" />
         </li>
       </ul>
 
@@ -34,14 +30,18 @@
           Underlying data
         </h3>
 
-        <DataTable label-header="Region" :rows="breakdownRows" value-header="On-time rate" />
+        <DataTable
+          label-header="Region"
+          :rows="breakdownRows"
+          :status-description="regionalThresholdDescription"
+          value-header="On-time rate"
+        />
       </div>
     </div>
   </WidgetCard>
 </template>
 
 <script lang="ts" setup>
-  import type { StatusLevel } from '@/data/thresholds'
   import type { ChartData, ChartOptions } from 'chart.js'
   import { computed } from 'vue'
   import { Bar } from 'vue-chartjs'
@@ -52,6 +52,7 @@
   import { useWidgetData } from '@/composables/useWidgetData'
   import { useFakeData } from '@/data/generateFakeData'
   import { getRegionalSummaries, type RegionSummary } from '@/data/selectors'
+  import { describeRegionalOnTimeRateThreshold, type StatusLevel } from '@/data/thresholds'
   import { useFiltersStore } from '@/stores/filters'
   import { themeColor } from '@/utils/chartTheme'
 
@@ -77,6 +78,7 @@
 
   const theme = useTheme()
   const filtersStore = useFiltersStore()
+  const regionalThresholdDescription = describeRegionalOnTimeRateThreshold()
 
   function compute (): RegionSummary[] {
     return getRegionalSummaries(useFakeData(), filtersStore.dateRangeDays)
@@ -87,13 +89,6 @@
     value => value.length === 0,
     { watchSource: () => filtersStore.dateRangeDays },
   )
-
-  const overallStatus = computed<StatusLevel>(() => {
-    if (!result.value) return 'critical'
-    if (result.value.some(r => r.status === 'critical')) return 'critical'
-    if (result.value.some(r => r.status === 'watch')) return 'watch'
-    return 'good'
-  })
 
   const chartData = computed<ChartData<'bar'>>(() => {
     const regions = result.value ?? []

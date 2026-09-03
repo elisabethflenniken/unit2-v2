@@ -6,3 +6,14 @@ export function formatShortDate (isoDate: string): string {
     timeZone: 'UTC',
   })
 }
+
+/** Full date + time for a timestamp (not a date-only string) — e.g. exception raised/resolved times. */
+export function formatDateTime (isoTimestamp: string): string {
+  return new Date(isoTimestamp).toLocaleString('en-US', {
+    month: 'short',
+    day: 'numeric',
+    year: 'numeric',
+    hour: 'numeric',
+    minute: '2-digit',
+  })
+}

@@ -14,7 +14,7 @@
         <td>{{ row.value }}</td>
 
         <td v-if="row.status">
-          <StatusChip :level="row.status" />
+          <StatusChip :description="statusDescription" :level="row.status" />
         </td>
       </tr>
     </tbody>
@@ -35,5 +35,7 @@
     rows: DataTableRow[]
     labelHeader: string
     valueHeader: string
+    /** Explanation shown in each row's status chip tooltip, since every row shares one meaning. */
+    statusDescription?: string
   }>()
 </script>
