@@ -3,6 +3,7 @@
     v-model="isOpen"
     aria-labelledby="widget-library-title"
     aria-modal="true"
+    color="background"
     location="right"
     retain-focus
     role="dialog"
@@ -30,20 +31,12 @@
       </h3>
 
       <TransitionGroup v-if="activeWidgets.length > 0" class="widget-list" name="widget-move" tag="div">
-        <v-card
+        <DrawerCard
           v-for="def in activeWidgets"
           :key="def.id"
-          class="mb-3 pa-3"
-          variant="outlined"
+          :description="def.description"
+          :title="def.title"
         >
-          <div class="text-subtitle-2 font-weight-bold mb-1">
-            {{ def.title }}
-          </div>
-
-          <p class="text-body-2 text-on-surface-variant mb-3">
-            {{ def.description }}
-          </p>
-
           <v-btn
             color="status-critical-subtle-text"
             prepend-icon="mdi-close-box-outline"
@@ -53,7 +46,7 @@
           >
             Remove from Dashboard
           </v-btn>
-        </v-card>
+        </DrawerCard>
       </TransitionGroup>
 
       <p v-else class="text-body-2 text-on-surface-variant">
@@ -69,20 +62,12 @@
       </h3>
 
       <TransitionGroup v-if="inactiveWidgets.length > 0" class="widget-list" name="widget-move" tag="div">
-        <v-card
+        <DrawerCard
           v-for="def in inactiveWidgets"
           :key="def.id"
-          class="mb-3 pa-3"
-          variant="outlined"
+          :description="def.description"
+          :title="def.title"
         >
-          <div class="text-subtitle-2 font-weight-bold mb-1">
-            {{ def.title }}
-          </div>
-
-          <p class="text-body-2 text-on-surface-variant mb-3">
-            {{ def.description }}
-          </p>
-
           <v-btn
             prepend-icon="mdi-plus-box-outline"
             size="small"
@@ -91,7 +76,7 @@
           >
             Add to Dashboard
           </v-btn>
-        </v-card>
+        </DrawerCard>
       </TransitionGroup>
 
       <p v-else class="text-body-2 text-on-surface-variant">
@@ -103,6 +88,7 @@
 
 <script lang="ts" setup>
   import { computed } from 'vue'
+  import DrawerCard from '@/components/dashboard/DrawerCard.vue'
   import { useDashboardStore } from '@/stores/dashboard'
   import { widgetRegistry } from '@/widgets/registry'
 
