@@ -17,7 +17,6 @@ const STORAGE_KEY = 'ff-dashboard-widgets'
 const DEFAULT_ACTIVE_IDS = [
   'kpi-volume',
   'kpi-on-time',
-  'kpi-regions',
   'kpi-exceptions',
   'chart-volume-trend',
   'chart-on-time-rate',

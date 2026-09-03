@@ -13,7 +13,7 @@
         variant="tonal"
         @click="isLibraryOpen = true"
       >
-        Add a graphic
+        Customize Dashboard
       </v-btn>
 
       <v-btn

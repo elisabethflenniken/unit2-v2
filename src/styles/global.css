@@ -17,6 +17,19 @@ body {
   opacity: 1;
 }
 
+/*
+ * StatusChip's tooltip (.status-chip-tooltip). Vuetify's default tooltip pairs an unthemed
+ * --v-theme-surface-variant background with our overridden --v-theme-on-surface-variant text
+ * color — neither token is part of our palette, so the pairing renders as low-contrast gray on
+ * gray in both themes. Matches Chart.js's own default tooltip styling (dark, theme-invariant)
+ * instead, since that's already legible against every chart on this dashboard.
+ */
+.v-tooltip > .v-overlay__content.status-chip-tooltip {
+  background: rgba(0, 0, 0, 0.8);
+  color: #fff;
+  border-radius: 6px;
+}
+
 @media (prefers-reduced-motion: reduce) {
   *,
   *::before,

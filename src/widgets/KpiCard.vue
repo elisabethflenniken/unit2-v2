@@ -38,7 +38,6 @@
         <DataTable
           :label-header="result.breakdownLabelHeader"
           :rows="result.breakdown"
-          :status-description="result.breakdownStatusDescription"
           :value-header="result.breakdownValueHeader"
         />
       </div>
@@ -56,15 +55,13 @@
     applyDateRange,
     getExceptionsSummary,
     getOnTimeSummary,
-    getRegionalSummaries,
     getSnapshotsForRegion,
     getVolumeSummary,
   } from '@/data/selectors'
-  import { describeRegionalOnTimeRateThreshold } from '@/data/thresholds'
   import { useFiltersStore } from '@/stores/filters'
   import { formatShortDate } from '@/utils/formatDate'
 
-  export type KpiMetric = 'volume' | 'onTime' | 'regions' | 'exceptions'
+  export type KpiMetric = 'volume' | 'onTime' | 'exceptions'
 
   const props = withDefaults(defineProps<{
     title: string
@@ -83,7 +80,6 @@
     breakdown: DataTableRow[]
     breakdownLabelHeader: string
     breakdownValueHeader: string
-    breakdownStatusDescription: string
   }
 
   const noData: KpiResult = {
@@ -94,15 +90,12 @@
     breakdown: [],
     breakdownLabelHeader: '',
     breakdownValueHeader: '',
-    breakdownStatusDescription: '',
   }
 
   const filtersStore = useFiltersStore()
 
   function computeKpi (metric: KpiMetric): KpiResult {
-    const data = useFakeData()
-    // "Regions on target" is inherently company-wide; the region filter doesn't narrow it.
-    const fullSnapshots = getSnapshotsForRegion(data, metric === 'regions' ? 'all' : filtersStore.regionId)
+    const fullSnapshots = getSnapshotsForRegion(useFakeData(), filtersStore.regionId)
     const rangeSnapshots = applyDateRange(fullSnapshots, filtersStore.dateRangeDays)
     const trailingDays = filtersStore.dateRangeDays
 
@@ -117,7 +110,6 @@
         breakdown: rangeSnapshots.toReversed().map(s => ({ label: formatShortDate(s.date), value: s.shipmentVolume.toLocaleString() })),
         breakdownLabelHeader: 'Date',
         breakdownValueHeader: 'Shipment volume',
-        breakdownStatusDescription: '',
       }
     }
 
@@ -132,37 +124,20 @@
         breakdown: rangeSnapshots.toReversed().map(s => ({ label: formatShortDate(s.date), value: `${(s.onTimeRate * 100).toFixed(1)}%` })),
         breakdownLabelHeader: 'Date',
         breakdownValueHeader: 'On-time rate',
-        breakdownStatusDescription: '',
       }
     }
 
-    if (metric === 'exceptions') {
-      const summary = getExceptionsSummary(fullSnapshots)
-      if (!summary) return noData
-      return {
-        displayValue: String(summary.count),
-        subtitle: `${summary.diffFromYesterday > 0 ? '+' : ''}${summary.diffFromYesterday} vs. yesterday`,
-        trendDirection: summary.diffFromYesterday === 0 ? null : (summary.diffFromYesterday > 0 ? 'up' : 'down'),
-        sparklineValues: rangeSnapshots.slice(-14).map(s => s.openExceptions),
-        breakdown: rangeSnapshots.toReversed().map(s => ({ label: formatShortDate(s.date), value: String(s.openExceptions) })),
-        breakdownLabelHeader: 'Date',
-        breakdownValueHeader: 'Open exceptions',
-        breakdownStatusDescription: '',
-      }
-    }
-
-    // metric === 'regions'
-    const regionSummaries = getRegionalSummaries(data, trailingDays)
-    const goodCount = regionSummaries.filter(r => r.status === 'good').length
+    // metric === 'exceptions'
+    const summary = getExceptionsSummary(fullSnapshots)
+    if (!summary) return noData
     return {
-      displayValue: `${goodCount}/${regionSummaries.length}`,
-      subtitle: `${goodCount} of ${regionSummaries.length} regions on target`,
-      trendDirection: null,
-      sparklineValues: [],
-      breakdown: regionSummaries.map(r => ({ label: r.name, value: `${(r.onTimeRate * 100).toFixed(1)}%`, status: r.status })),
-      breakdownLabelHeader: 'Region',
-      breakdownValueHeader: 'On-time rate',
-      breakdownStatusDescription: describeRegionalOnTimeRateThreshold(),
+      displayValue: String(summary.count),
+      subtitle: `${summary.diffFromYesterday > 0 ? '+' : ''}${summary.diffFromYesterday} vs. yesterday`,
+      trendDirection: summary.diffFromYesterday === 0 ? null : (summary.diffFromYesterday > 0 ? 'up' : 'down'),
+      sparklineValues: rangeSnapshots.slice(-14).map(s => s.openExceptions),
+      breakdown: rangeSnapshots.toReversed().map(s => ({ label: formatShortDate(s.date), value: String(s.openExceptions) })),
+      breakdownLabelHeader: 'Date',
+      breakdownValueHeader: 'Open exceptions',
     }
   }
 

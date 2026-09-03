@@ -27,7 +27,7 @@
             />
           </template>
 
-          <v-list density="compact">
+          <v-list class="widget-menu-list" density="compact">
             <v-list-item
               prepend-icon="mdi-close-box-outline"
               title="Remove from dashboard"
@@ -61,6 +61,11 @@
 </script>
 
 <style scoped>
+/* Vuetify's default icon-to-text gap in a v-list-item (32px) reads too wide for a compact menu. */
+.widget-menu-list {
+  --v-list-prepend-gap: 12px;
+}
+
 .widget-card {
   border-radius: 16px;
 }

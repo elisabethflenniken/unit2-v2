@@ -32,6 +32,11 @@ should still be legible.
 green for a "primary" button or blue for a "success" state — keeping the vocabulary strict is what makes
 status scannable at a glance.
 
+**Exception:** destructive actions (e.g. the "Remove from Dashboard" button in the widget library panel) use
+the critical-red text token (`status-critical-subtle-text`) on a tertiary/text-variant button. This is a
+deliberate, explicit call — confirmed after flagging the conflict with the rule above — not a precedent for
+using red elsewhere; don't extend it to new components without the same explicit confirmation.
+
 ### Light theme (default)
 
 | Token | Hex | Use | Contrast |

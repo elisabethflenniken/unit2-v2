@@ -42,15 +42,6 @@ export const widgetRegistry: WidgetDefinition[] = [
     category: 'kpi',
   },
   {
-    id: 'kpi-regions',
-    title: 'Regional Performance',
-    description: 'How many regions are currently on target.',
-    component: KpiCard,
-    props: { title: 'Regional Performance', metric: 'regions' },
-    size: 'small',
-    category: 'kpi',
-  },
-  {
     id: 'kpi-exceptions',
     title: 'Open Exceptions',
     description: 'Company-wide open exception count.',

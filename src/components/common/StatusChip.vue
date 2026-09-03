@@ -6,7 +6,7 @@
   >
     <v-icon aria-hidden="true" :icon="icon" start />
     {{ statusWord }}
-    <v-tooltip activator="parent" location="top" max-width="280">
+    <v-tooltip activator="parent" content-class="status-chip-tooltip" location="top" max-width="280">
       {{ description || genericDescription }}
     </v-tooltip>
   </v-chip>

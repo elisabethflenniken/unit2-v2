@@ -70,12 +70,6 @@
     critical: 'Critical',
   }
 
-  const statusColorKey: Record<StatusLevel, string> = {
-    good: 'status-good',
-    watch: 'status-watch',
-    critical: 'status-critical',
-  }
-
   const theme = useTheme()
   const filtersStore = useFiltersStore()
   const regionalThresholdDescription = describeRegionalOnTimeRateThreshold()
@@ -98,7 +92,7 @@
         {
           label: 'On-time rate',
           data: regions.map(r => Number((r.onTimeRate * 100).toFixed(1))),
-          backgroundColor: regions.map(r => themeColor(theme, statusColorKey[r.status])),
+          backgroundColor: themeColor(theme, 'primary'),
           borderRadius: 4,
           maxBarThickness: 48,
         },
